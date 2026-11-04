@@ -38,7 +38,7 @@ const Recad = () => {
     const value = e.target.value;
     setInputValue(value);
     if (value) {
-      const parsedDate = parse(value, "yyyy-MM-dd", new Date());
+      const parsedDate = parse(value, "yyyy-MM-dd", new Date().toLocaleTimeString("pt-BR"));
       if (isValid(parsedDate)) {
         setDate(parsedDate);
       }
@@ -63,8 +63,8 @@ const Recad = () => {
   return (
     <section className="flex flex-col w-full h-screen justify-center items-center from-zinc-200 pb-8 dark:from-black">
       <Card className="w-2/6 shadow-md">
-        <CardHeader>
-          <CardTitle className="m-auto">Login</CardTitle>
+        <CardHeader className="flex flex-col gap-2">
+          <CardTitle className="m-auto text-2xl">Login</CardTitle>
         </CardHeader>
         <CardPanel className="flex flex-col gap-4">
           <CardDescription className="text-center">
