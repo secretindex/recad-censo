@@ -2,8 +2,11 @@
 
 import Link from "next/link"
 
-import { format, isValid, parse } from "date-fns"
+import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar"
+
+import useRouter from "next/navigation"
+
 import {
   InputGroup,
   InputGroupAddon,
@@ -31,10 +34,12 @@ import { Input } from "@/components/ui/input"
 import { isValidCPF } from "./cpf_validator"
 import { toastManager } from "@/components/ui/toast"
 
+const DATE_FORMAT = "dd-MM-yyyy"
+
 const Recad = () => {
   const [cpf, setCpf] = useState("")
   const [cpfTouched, setCpfTouched] = useState(false)
-  const [date, setDate] = useState<Date | undefined>()
+  const [date, setDate] = useState<Date | string | undefined>()
 
   const [inputValue, setInputValue] = useState("")
   const cpfIsValid = isValidCPF(cpf)
@@ -45,33 +50,30 @@ const Recad = () => {
     if (!cpfIsValid) return
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Input value:", e.target.value)
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 8)
+    const value = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4)]
+      .filter(Boolean)
+      .join("/")
+
     setInputValue(value)
-    if (value) {
-      const parsedDate = parse(
-        value,
-        "yyyy-MM-dd",
-        new Date().toLocaleTimeString("pt-BR"),
-      )
-      if (isValid(parsedDate)) {
-        setDate(parsedDate)
-      }
-    } else {
-      setDate(undefined)
-    }
+
+    setDate(inputValue)
   }
 
   const handleSelect = (selectedDate: Date | undefined) => {
     setDate(selectedDate)
     if (selectedDate) {
-      setInputValue(format(selectedDate, "yyyy-MM-dd"))
+      setInputValue(format(selectedDate, DATE_FORMAT))
     } else {
       setInputValue("")
     }
   }
 
-  const handleSubmitClick = () => {
+  const handleSubmitClick = async () => {
+    console.log("Selected date:", date)
+
     if (!cpfIsValid) {
       toastManager.add({
         title: "CPF Invalido",
@@ -80,6 +82,7 @@ const Recad = () => {
       })
       return
     }
+
     if (!date) {
       toastManager.add({
         title: "Data de Nascimento Invalida",
@@ -89,7 +92,17 @@ const Recad = () => {
       return
     }
 
-    axios.post("/api/recad", { cpf, date })
+    const res = await axios.post("/api/recadastramento", { cpf, date })
+
+    if (res.status === 200) {
+      toastManager.add({
+        title: "Cadastro encontrado",
+        description:
+          "Você será redirecionado para a página de recadastramento.",
+        type: "success",
+      })
+      useRouter.redirect(`/recadastramento/${res.data.id}`)
+    }
   }
 
   useEffect(() => {
@@ -140,11 +153,15 @@ const Recad = () => {
               <Popover>
                 <InputGroup>
                   <InputGroupInput
-                    aria-label="Select date"
+                    id="birthDate"
+                    aria-label="Data de nascimento"
                     className="*:[input]:[&::-webkit-calendar-picker-indicator]:hidden *:[input]:[&::-webkit-calendar-picker-indicator]:appearance-none"
-                    onChange={handleInputChange}
+                    onChange={handleDateChange}
                     onClick={(e) => e.stopPropagation()}
-                    type="date"
+                    inputMode="numeric"
+                    maxLength={10}
+                    placeholder="dd-mm-aaaa"
+                    type="text"
                     value={inputValue}
                   />
                   <InputGroupAddon>
@@ -166,12 +183,16 @@ const Recad = () => {
                   <Calendar
                     mode="single"
                     onSelect={handleSelect}
-                    selected={date}
+                    selected={date as Date}
                   />
                 </PopoverPopup>
               </Popover>
             </div>
-            <Button className="w-full m-auto" type="submit" onClick={handleSubmitClick}>
+            <Button
+              className="w-full m-auto"
+              type="submit"
+              onClick={handleSubmitClick}
+            >
               Entrar
             </Button>
           </form>

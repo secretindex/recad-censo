@@ -23,7 +23,7 @@ const Admin = () => {
         <CardContent>
           <form className="flex flex-col gap-4">
             <div>
-              <Label htmlFor="email">Username</Label>
+              <Label htmlFor="email">Email</Label>
               <Input type="text" id="email" name="email" placeholder="Enter your email" />
             </div>
             <div>
