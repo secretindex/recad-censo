@@ -6,12 +6,15 @@ export async function POST(req: Request) {
 
   try {
     const { cpf, date } = await req.json()
+    const formattedDate = new Date(date).toLocaleDateString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+    });
 
     const { data, error } = await supabase
       .from("segurados")
       .select("*")
-      .eq("cpf", cpf)
-      .eq("date", date)
+      .eq("cpf", cpf as string)
+      .eq("data_de_nascimento", formattedDate)
 
     if (error) throw new Error("Erro ao buscar cadastro: " + error.message)
 

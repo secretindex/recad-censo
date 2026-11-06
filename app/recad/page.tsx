@@ -5,7 +5,7 @@ import Link from "next/link"
 import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar"
 
-import useRouter from "next/navigation"
+import { useRouter } from "next/navigation"
 
 import {
   InputGroup,
@@ -37,6 +37,7 @@ import { toastManager } from "@/components/ui/toast"
 const DATE_FORMAT = "dd-MM-yyyy"
 
 const Recad = () => {
+  const router = useRouter()
   const [cpf, setCpf] = useState("")
   const [cpfTouched, setCpfTouched] = useState(false)
   const [date, setDate] = useState<Date | string | undefined>()
@@ -44,22 +45,15 @@ const Recad = () => {
   const [inputValue, setInputValue] = useState("")
   const cpfIsValid = isValidCPF(cpf)
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setCpfTouched(true)
-    if (!cpfIsValid) return
-  }
-
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("Input value:", e.target.value)
     const digits = e.target.value.replace(/\D/g, "").slice(0, 8)
+
     const value = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4)]
       .filter(Boolean)
       .join("/")
 
     setInputValue(value)
-
-    setDate(inputValue)
+    setDate(value)
   }
 
   const handleSelect = (selectedDate: Date | undefined) => {
@@ -92,16 +86,22 @@ const Recad = () => {
       return
     }
 
-    const res = await axios.post("/api/recadastramento", { cpf, date })
+    const res = await axios.post("/api/recad", {
+      cpf,
+      date,
+    })
 
-    if (res.status === 200) {
+    console.log("Response from API:", res.data)
+
+    if (res.data.length > 0) {
       toastManager.add({
         title: "Cadastro encontrado",
         description:
           "Você será redirecionado para a página de recadastramento.",
         type: "success",
       })
-      useRouter.redirect(`/recadastramento/${res.data.id}`)
+
+      router.push(`/recad/${res.data[0].id}`)
     }
   }
 
@@ -120,7 +120,7 @@ const Recad = () => {
             Digite seu CPF e data de nascimento para acessar o sistema de
             recadastramento.
           </CardDescription>
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <Label htmlFor="cpf">CPF</Label>
               <Input
@@ -190,7 +190,6 @@ const Recad = () => {
             </div>
             <Button
               className="w-full m-auto"
-              type="submit"
               onClick={handleSubmitClick}
             >
               Entrar
