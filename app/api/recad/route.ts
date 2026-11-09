@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     const { data, error } = await supabase
       .from("segurados")
       .select("*")
-      .eq("cpf", cpf as string)
+      .eq("cpf", (cpf as string).replaceAll(".", "").replace("-", ""))
       .eq("data_de_nascimento", formattedDate)
 
     if (error) throw new Error("Erro ao buscar cadastro: " + error.message)

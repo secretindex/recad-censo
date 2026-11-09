@@ -27,7 +27,7 @@ import {
   CardPanel,
 } from "@/components/ui/card"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, KeyboardEvent, MouseEventHandler } from "react"
 
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -75,8 +75,6 @@ const Recad = () => {
   }
 
   const handleSubmitClick = async () => {
-    console.log("Selected date:", date)
-
     if (!cpfIsValid) {
       toastManager.add({
         title: "CPF Invalido",
@@ -138,7 +136,12 @@ const Recad = () => {
             Digite seu CPF e data de nascimento para acessar o sistema de
             recadastramento.
           </CardDescription>
-          <form className="flex flex-col gap-4">
+          <form
+            className="flex flex-col gap-4"
+            onKeyDownCapture={(e: KeyboardEvent) =>
+              e.key === 'Enter' && handleSubmitClick()
+            }
+          >
             <div className="flex flex-col gap-1">
               <Label htmlFor="cpf">CPF</Label>
               <Input
