@@ -45,6 +45,15 @@ const Recad = () => {
   const [inputValue, setInputValue] = useState("")
   const cpfIsValid = isValidCPF(cpf)
 
+  function formatCPF(value: string): string {
+    return value
+      .replace(/\D/g, "")
+      .slice(0, 11)
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
+  }
+
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const digits = e.target.value.replace(/\D/g, "").slice(0, 8)
 
@@ -109,6 +118,15 @@ const Recad = () => {
     console.log("Selected date:", date)
   }, [date])
 
+  useEffect(() => {
+    setCpf(formatCPF(cpf))
+
+    if (!cpfIsValid) {
+      const tempCpf = cpf.replaceAll(".", "").replace("-", "")
+      setCpf(tempCpf)
+    }
+  }, [cpfIsValid])
+
   return (
     <section className="flex flex-col w-full h-screen justify-center items-center from-zinc-200 pb-8 dark:from-black">
       <Card className="w-2/6 shadow-md">
@@ -127,6 +145,7 @@ const Recad = () => {
                 id="cpf"
                 type="text"
                 inputMode="numeric"
+                pattern="[0-9]*"
                 placeholder="123.456.789-09"
                 value={cpf}
                 maxLength={14}
@@ -188,10 +207,7 @@ const Recad = () => {
                 </PopoverPopup>
               </Popover>
             </div>
-            <Button
-              className="w-full m-auto"
-              onClick={handleSubmitClick}
-            >
+            <Button className="w-full m-auto" onClick={handleSubmitClick}>
               Entrar
             </Button>
           </form>
