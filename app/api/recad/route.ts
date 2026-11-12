@@ -15,7 +15,9 @@ export async function GET(req: NextRequest) {
     }
     const { data, error } = await supabase
       .from("segurados")
-      .select("*")
+      .select(
+        '*, matricula(*)'
+      )
       .eq("id", id)
     if (error) throw new Error("Erro ao buscar cadastro: " + error.message)
 
