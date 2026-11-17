@@ -4,7 +4,6 @@ import { Geist, Geist_Mono, IBM_Plex_Sans } from "next/font/google"
 import type { Metadata } from "next"
 
 import "./globals.css"
-import { Toast } from "@base-ui/react"
 
 const ibmPlexSans = IBM_Plex_Sans({
   variable: "--font-ibm-plex",
