@@ -228,9 +228,9 @@
     (async () => {
       const browser = await puppeteer.launch()
       const page = await browser.newPage()
-      await page.setViewport({ width: 520, height: 700, deviceScaleFactor: 3 }) // 3x = alta resolução
+      await page.setViewport({ width: 520, height: 700, deviceScaleFactor: 3 })
       await page.goto("file://" + __dirname + "/card.html")
-      await page.waitForNetworkIdle() // espera a foto carregar
+      await page.waitForNetworkIdle()
       const el = await page.$(".card")
       await el.screenshot({ path: "partita-card.png" })
       await browser.close()

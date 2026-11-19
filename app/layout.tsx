@@ -1,5 +1,4 @@
 import { AnchoredToastProvider, ToastProvider } from "@/components/ui/toast"
-
 import { Geist, Geist_Mono, IBM_Plex_Sans } from "next/font/google"
 import type { Metadata } from "next"
 
